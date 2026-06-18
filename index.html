@@ -2,18 +2,30 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Item Analyzer</title>
 
 <style>
-body {
+/* =========================
+   GLOBAL FIX (IMPORTANT)
+========================= */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
     margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
     font-family: Arial;
     background: #0f0f0f;
     color: white;
+    -webkit-text-size-adjust: 100%;
 }
 
+/* HEADER */
 .header {
     text-align: center;
     padding: 12px;
@@ -21,18 +33,23 @@ body {
     font-weight: bold;
 }
 
+/* MAIN VIEW */
 .view {
-    padding: 16px;
+    padding: 14px;
     padding-bottom: 90px;
+    width: 100%;
 }
 
+/* CARD */
 .card {
     background: #1c1c1c;
     border-radius: 14px;
-    padding: 16px;
-    margin-bottom: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
+    width: 100%;
 }
 
+/* INPUTS (ANDROID SAFE) */
 input, select {
     width: 100%;
     padding: 12px;
@@ -44,21 +61,32 @@ input, select {
     font-size: 16px;
 }
 
+/* RESULT BOX (FIX OVERFLOW) */
 .result {
     background: #111;
     padding: 12px;
     border-radius: 10px;
     margin-top: 10px;
-    transition: all 0.3s ease;
+
+    width: 100%;
+    max-width: 100%;
+
+    word-break: break-word;
+    overflow-wrap: anywhere;
+
+    white-space: normal;
 }
 
-/* GLOW SYSTEM */
-.glow-green { box-shadow: 0 0 12px rgba(0,255,120,0.6); border: 1px solid rgba(0,255,120,0.4); }
-.glow-blue { box-shadow: 0 0 12px rgba(0,150,255,0.6); border: 1px solid rgba(0,150,255,0.4); }
-.glow-purple { box-shadow: 0 0 12px rgba(180,80,255,0.6); border: 1px solid rgba(180,80,255,0.4); }
-.glow-orange { box-shadow: 0 0 12px rgba(255,140,0,0.6); border: 1px solid rgba(255,140,0,0.4); }
-.glow-red { box-shadow: 0 0 12px rgba(255,60,60,0.6); border: 1px solid rgba(255,60,60,0.4); }
+/* =========================
+   GLOW SYSTEM
+========================= */
+.glow-green { box-shadow: 0 0 10px rgba(0,255,120,0.6); border: 1px solid rgba(0,255,120,0.4); }
+.glow-blue { box-shadow: 0 0 10px rgba(0,150,255,0.6); border: 1px solid rgba(0,150,255,0.4); }
+.glow-purple { box-shadow: 0 0 10px rgba(180,80,255,0.6); border: 1px solid rgba(180,80,255,0.4); }
+.glow-orange { box-shadow: 0 0 10px rgba(255,140,0,0.6); border: 1px solid rgba(255,140,0,0.4); }
+.glow-red { box-shadow: 0 0 10px rgba(255,60,60,0.6); border: 1px solid rgba(255,60,60,0.4); }
 
+/* BOTTOM NAV */
 .nav {
     position: fixed;
     bottom: 0;
@@ -158,6 +186,9 @@ Rarity
 
 
 <script>
+/* =========================
+   CORE LOGIC
+========================= */
 function getDivisor(r) {
     switch(r) {
         case "Common": return 0.6;
@@ -176,6 +207,9 @@ function getRating(lvl, val) {
     return ["WEAK", 25, "red"];
 }
 
+/* =========================
+   GLOW HELPER
+========================= */
 function setGlow(el, color) {
     el.classList.remove(
         "glow-green","glow-blue","glow-purple","glow-orange","glow-red"
@@ -183,7 +217,9 @@ function setGlow(el, color) {
     el.classList.add("glow-" + color);
 }
 
-/* ARMOR */
+/* =========================
+   ARMOR AUTO-CALC
+========================= */
 function calcArmor() {
     let lvl = +a_lvl.value;
     let val = +a_val.value;
@@ -201,7 +237,9 @@ function calcArmor() {
     setGlow(a_result, res[2]);
 }
 
-/* WEAPON */
+/* =========================
+   WEAPON AUTO-CALC
+========================= */
 function calcWeapon() {
     let lvl = +w_lvl.value;
     let min = +w_min.value;
@@ -222,7 +260,9 @@ function calcWeapon() {
     setGlow(w_result, res[2]);
 }
 
-/* AUTO-CALC */
+/* =========================
+   AUTO-CALC TRIGGERS
+========================= */
 [a_lvl, a_val, a_rarity].forEach(e =>
     e.addEventListener("input", calcArmor)
 );
@@ -231,7 +271,9 @@ function calcWeapon() {
     e.addEventListener("input", calcWeapon)
 );
 
-/* NAV */
+/* =========================
+   NAVIGATION
+========================= */
 function showTab(tab, btn) {
     armorView.style.display = tab === "armor" ? "block" : "none";
     weaponView.style.display = tab === "weapon" ? "block" : "none";
