@@ -2,71 +2,120 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Item Analyzer</title>
 
 <style>
 body {
-    font-family: Segoe UI, Arial;
-    background: #111;
+    margin: 0;
+    font-family: Arial;
+    background: #0f0f0f;
     color: white;
-    margin: 20px;
 }
 
-.container {
-    display: flex;
-    gap: 40px;
+/* TOP HEADER */
+.header {
+    text-align: center;
+    padding: 12px;
+    font-weight: bold;
+    background: #1a1a1a;
 }
 
+/* MAIN VIEW */
+.view {
+    padding: 16px;
+    padding-bottom: 90px;
+}
+
+/* CARD STYLE */
 .card {
     background: #1c1c1c;
-    padding: 20px;
-    border-radius: 10px;
-    width: 320px;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 16px;
 }
 
+/* INPUTS */
 input, select {
     width: 100%;
-    margin: 5px 0 10px;
-    padding: 6px;
+    padding: 12px;
+    margin: 6px 0 12px;
+    border-radius: 8px;
+    border: none;
+    background: #2a2a2a;
+    color: white;
+    font-size: 16px;
 }
 
-.bar {
-    height: 18px;
-    background: #333;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.fill {
-    height: 100%;
-    width: 0%;
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
     background: #00aaff;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
 }
 
+/* RESULT CARD */
 .result {
-    margin-top: 10px;
-    font-weight: bold;
+    position: sticky;
+    bottom: 70px;
+    background: #111;
+    border-top: 1px solid #333;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 10px;
+}
+
+/* BOTTOM NAV */
+.nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: #1a1a1a;
+    display: flex;
+    border-top: 1px solid #333;
+}
+
+.nav button {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 14px;
+}
+
+.nav button.active {
+    color: #00aaff;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Item Analyzer (Web Version)</h2>
+<div class="header">Item Analyzer</div>
 
-<div class="container">
+<div class="view">
 
-<!-- ARMOR -->
+<!-- ARMOR VIEW -->
+<div id="armorView">
+
 <div class="card">
-<h3>Armor</h3>
+<h3>Armor Calculator</h3>
 
-Item Level<br>
+Item Level
 <input id="a_lvl" type="number">
 
-Armor Value<br>
+Armor Value
 <input id="a_val" type="number">
 
-Rarity<br>
+Rarity
 <select id="a_rarity">
 <option>Common</option>
 <option>Rare</option>
@@ -76,28 +125,31 @@ Rarity<br>
 </select>
 
 <button onclick="calcArmor()">Calculate</button>
+</div>
 
-<div class="bar"><div id="a_bar" class="fill"></div></div>
-
-<div id="a_result" class="result">Waiting...</div>
-<div id="a_score"></div>
+<div class="result" id="a_resultBox">
+Waiting...
+</div>
 
 </div>
 
-<!-- WEAPON -->
-<div class="card">
-<h3>Weapon</h3>
 
-Item Level<br>
+<!-- WEAPON VIEW -->
+<div id="weaponView" style="display:none">
+
+<div class="card">
+<h3>Weapon Calculator</h3>
+
+Item Level
 <input id="w_lvl" type="number">
 
-Min Damage<br>
+Min Damage
 <input id="w_min" type="number">
 
-Max Damage<br>
+Max Damage
 <input id="w_max" type="number">
 
-Rarity<br>
+Rarity
 <select id="w_rarity">
 <option>Common</option>
 <option>Rare</option>
@@ -107,16 +159,23 @@ Rarity<br>
 </select>
 
 <button onclick="calcWeapon()">Calculate</button>
+</div>
 
-<div class="bar"><div id="w_bar" class="fill"></div></div>
-
-<div id="w_result" class="result">Waiting...</div>
-<div id="w_score"></div>
-<div id="w_avg"></div>
-
+<div class="result" id="w_resultBox">
+Waiting...
 </div>
 
 </div>
+
+</div>
+
+
+<!-- BOTTOM NAV -->
+<div class="nav">
+<button class="active" onclick="showTab('armor', this)">Armor</button>
+<button onclick="showTab('weapon', this)">Weapon</button>
+</div>
+
 
 <script>
 function getDivisor(r) {
@@ -137,35 +196,49 @@ function getRating(lvl, val) {
     return ["WEAK", 25, "red"];
 }
 
+
+/* ARMOR */
 function calcArmor() {
-    let lvl = +document.getElementById("a_lvl").value;
-    let val = +document.getElementById("a_val").value;
-    let r = document.getElementById("a_rarity").value;
+    let lvl = +a_lvl.value;
+    let val = +a_val.value;
+    let r = a_rarity.value;
 
     let calc = val / getDivisor(r);
     let res = getRating(lvl, calc);
 
-    document.getElementById("a_bar").style.width = res[1] + "%";
-    document.getElementById("a_bar").style.background = res[2];
-    document.getElementById("a_result").innerText = res[0];
-    document.getElementById("a_score").innerText = "Armor Score: " + calc.toFixed(1);
+    a_resultBox.innerHTML =
+        `<b style="color:${res[2]}">${res[0]}</b><br>` +
+        `Armor Score: ${calc.toFixed(1)}`;
 }
 
+
+/* WEAPON */
 function calcWeapon() {
-    let lvl = +document.getElementById("w_lvl").value;
-    let min = +document.getElementById("w_min").value;
-    let max = +document.getElementById("w_max").value;
-    let r = document.getElementById("w_rarity").value;
+    let lvl = +w_lvl.value;
+    let min = +w_min.value;
+    let max = +w_max.value;
+    let r = w_rarity.value;
 
     let avg = (min + max) / 2;
     let calc = avg / getDivisor(r);
     let res = getRating(lvl, calc);
 
-    document.getElementById("w_bar").style.width = res[1] + "%";
-    document.getElementById("w_bar").style.background = res[2];
-    document.getElementById("w_result").innerText = res[0];
-    document.getElementById("w_score").innerText = "Weapon Score: " + calc.toFixed(1);
-    document.getElementById("w_avg").innerText = "Avg: " + avg.toFixed(1);
+    w_resultBox.innerHTML =
+        `<b style="color:${res[2]}">${res[0]}</b><br>` +
+        `Score: ${calc.toFixed(1)}<br>` +
+        `Avg: ${avg.toFixed(1)}`;
+}
+
+
+/* NAVIGATION */
+function showTab(tab, btn) {
+    armorView.style.display = (tab === "armor") ? "block" : "none";
+    weaponView.style.display = (tab === "weapon") ? "block" : "none";
+
+    document.querySelectorAll(".nav button")
+        .forEach(b => b.classList.remove("active"));
+
+    btn.classList.add("active");
 }
 </script>
 
