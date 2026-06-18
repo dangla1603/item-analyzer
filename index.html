@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Item Analyzer</title>
+
+<style>
+body {
+    font-family: Segoe UI, Arial;
+    background: #111;
+    color: white;
+    margin: 20px;
+}
+
+.container {
+    display: flex;
+    gap: 40px;
+}
+
+.card {
+    background: #1c1c1c;
+    padding: 20px;
+    border-radius: 10px;
+    width: 320px;
+}
+
+input, select {
+    width: 100%;
+    margin: 5px 0 10px;
+    padding: 6px;
+}
+
+.bar {
+    height: 18px;
+    background: #333;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.fill {
+    height: 100%;
+    width: 0%;
+    background: #00aaff;
+}
+
+.result {
+    margin-top: 10px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Item Analyzer (Web Version)</h2>
+
+<div class="container">
+
+<!-- ARMOR -->
+<div class="card">
+<h3>Armor</h3>
+
+Item Level<br>
+<input id="a_lvl" type="number">
+
+Armor Value<br>
+<input id="a_val" type="number">
+
+Rarity<br>
+<select id="a_rarity">
+<option>Common</option>
+<option>Rare</option>
+<option>Exquisite</option>
+<option>Legend</option>
+<option>Ancient</option>
+</select>
+
+<button onclick="calcArmor()">Calculate</button>
+
+<div class="bar"><div id="a_bar" class="fill"></div></div>
+
+<div id="a_result" class="result">Waiting...</div>
+<div id="a_score"></div>
+
+</div>
+
+<!-- WEAPON -->
+<div class="card">
+<h3>Weapon</h3>
+
+Item Level<br>
+<input id="w_lvl" type="number">
+
+Min Damage<br>
+<input id="w_min" type="number">
+
+Max Damage<br>
+<input id="w_max" type="number">
+
+Rarity<br>
+<select id="w_rarity">
+<option>Common</option>
+<option>Rare</option>
+<option>Exquisite</option>
+<option>Legend</option>
+<option>Ancient</option>
+</select>
+
+<button onclick="calcWeapon()">Calculate</button>
+
+<div class="bar"><div id="w_bar" class="fill"></div></div>
+
+<div id="w_result" class="result">Waiting...</div>
+<div id="w_score"></div>
+<div id="w_avg"></div>
+
+</div>
+
+</div>
+
+<script>
+function getDivisor(r) {
+    switch(r) {
+        case "Common": return 0.6;
+        case "Rare": return 0.7;
+        case "Exquisite": return 0.8;
+        case "Legend": return 0.9;
+        default: return 1.0;
+    }
+}
+
+function getRating(lvl, val) {
+    if (val >= lvl * 15) return ["BEST RATE", 100, "green"];
+    if (val >= lvl * 14) return ["SECOND BEST", 85, "blue"];
+    if (val >= lvl * 13) return ["GREAT", 70, "purple"];
+    if (val >= lvl * 12) return ["OK", 50, "orange"];
+    return ["WEAK", 25, "red"];
+}
+
+function calcArmor() {
+    let lvl = +document.getElementById("a_lvl").value;
+    let val = +document.getElementById("a_val").value;
+    let r = document.getElementById("a_rarity").value;
+
+    let calc = val / getDivisor(r);
+    let res = getRating(lvl, calc);
+
+    document.getElementById("a_bar").style.width = res[1] + "%";
+    document.getElementById("a_bar").style.background = res[2];
+    document.getElementById("a_result").innerText = res[0];
+    document.getElementById("a_score").innerText = "Armor Score: " + calc.toFixed(1);
+}
+
+function calcWeapon() {
+    let lvl = +document.getElementById("w_lvl").value;
+    let min = +document.getElementById("w_min").value;
+    let max = +document.getElementById("w_max").value;
+    let r = document.getElementById("w_rarity").value;
+
+    let avg = (min + max) / 2;
+    let calc = avg / getDivisor(r);
+    let res = getRating(lvl, calc);
+
+    document.getElementById("w_bar").style.width = res[1] + "%";
+    document.getElementById("w_bar").style.background = res[2];
+    document.getElementById("w_result").innerText = res[0];
+    document.getElementById("w_score").innerText = "Weapon Score: " + calc.toFixed(1);
+    document.getElementById("w_avg").innerText = "Avg: " + avg.toFixed(1);
+}
+</script>
+
+</body>
+</html>
