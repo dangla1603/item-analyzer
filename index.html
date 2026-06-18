@@ -14,21 +14,18 @@ body {
     color: white;
 }
 
-/* TOP HEADER */
 .header {
     text-align: center;
     padding: 12px;
-    font-weight: bold;
     background: #1a1a1a;
+    font-weight: bold;
 }
 
-/* MAIN VIEW */
 .view {
     padding: 16px;
     padding-bottom: 90px;
 }
 
-/* CARD STYLE */
 .card {
     background: #1c1c1c;
     border-radius: 14px;
@@ -36,7 +33,6 @@ body {
     margin-bottom: 16px;
 }
 
-/* INPUTS */
 input, select {
     width: 100%;
     padding: 12px;
@@ -48,30 +44,21 @@ input, select {
     font-size: 16px;
 }
 
-/* BUTTON */
-button {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    background: #00aaff;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-/* RESULT CARD */
 .result {
-    position: sticky;
-    bottom: 70px;
     background: #111;
-    border-top: 1px solid #333;
     padding: 12px;
-    margin-top: 12px;
     border-radius: 10px;
+    margin-top: 10px;
+    transition: all 0.3s ease;
 }
 
-/* BOTTOM NAV */
+/* GLOW SYSTEM */
+.glow-green { box-shadow: 0 0 12px rgba(0,255,120,0.6); border: 1px solid rgba(0,255,120,0.4); }
+.glow-blue { box-shadow: 0 0 12px rgba(0,150,255,0.6); border: 1px solid rgba(0,150,255,0.4); }
+.glow-purple { box-shadow: 0 0 12px rgba(180,80,255,0.6); border: 1px solid rgba(180,80,255,0.4); }
+.glow-orange { box-shadow: 0 0 12px rgba(255,140,0,0.6); border: 1px solid rgba(255,140,0,0.4); }
+.glow-red { box-shadow: 0 0 12px rgba(255,60,60,0.6); border: 1px solid rgba(255,60,60,0.4); }
+
 .nav {
     position: fixed;
     bottom: 0;
@@ -103,11 +90,11 @@ button {
 
 <div class="view">
 
-<!-- ARMOR VIEW -->
+<!-- ARMOR -->
 <div id="armorView">
 
 <div class="card">
-<h3>Armor Calculator</h3>
+<h3>Armor</h3>
 
 Item Level
 <input id="a_lvl" type="number">
@@ -124,21 +111,18 @@ Rarity
 <option>Ancient</option>
 </select>
 
-<button onclick="calcArmor()">Calculate</button>
-</div>
+<div id="a_result" class="result">Waiting...</div>
 
-<div class="result" id="a_resultBox">
-Waiting...
 </div>
 
 </div>
 
 
-<!-- WEAPON VIEW -->
+<!-- WEAPON -->
 <div id="weaponView" style="display:none">
 
 <div class="card">
-<h3>Weapon Calculator</h3>
+<h3>Weapon</h3>
 
 Item Level
 <input id="w_lvl" type="number">
@@ -158,19 +142,15 @@ Rarity
 <option>Ancient</option>
 </select>
 
-<button onclick="calcWeapon()">Calculate</button>
-</div>
+<div id="w_result" class="result">Waiting...</div>
 
-<div class="result" id="w_resultBox">
-Waiting...
 </div>
 
 </div>
 
 </div>
 
-
-<!-- BOTTOM NAV -->
+<!-- NAV -->
 <div class="nav">
 <button class="active" onclick="showTab('armor', this)">Armor</button>
 <button onclick="showTab('weapon', this)">Weapon</button>
@@ -196,6 +176,12 @@ function getRating(lvl, val) {
     return ["WEAK", 25, "red"];
 }
 
+function setGlow(el, color) {
+    el.classList.remove(
+        "glow-green","glow-blue","glow-purple","glow-orange","glow-red"
+    );
+    el.classList.add("glow-" + color);
+}
 
 /* ARMOR */
 function calcArmor() {
@@ -203,14 +189,17 @@ function calcArmor() {
     let val = +a_val.value;
     let r = a_rarity.value;
 
+    if (!lvl || !val) return;
+
     let calc = val / getDivisor(r);
     let res = getRating(lvl, calc);
 
-    a_resultBox.innerHTML =
+    a_result.innerHTML =
         `<b style="color:${res[2]}">${res[0]}</b><br>` +
         `Armor Score: ${calc.toFixed(1)}`;
-}
 
+    setGlow(a_result, res[2]);
+}
 
 /* WEAPON */
 function calcWeapon() {
@@ -219,21 +208,33 @@ function calcWeapon() {
     let max = +w_max.value;
     let r = w_rarity.value;
 
+    if (!lvl || !min || !max) return;
+
     let avg = (min + max) / 2;
     let calc = avg / getDivisor(r);
     let res = getRating(lvl, calc);
 
-    w_resultBox.innerHTML =
+    w_result.innerHTML =
         `<b style="color:${res[2]}">${res[0]}</b><br>` +
         `Score: ${calc.toFixed(1)}<br>` +
         `Avg: ${avg.toFixed(1)}`;
+
+    setGlow(w_result, res[2]);
 }
 
+/* AUTO-CALC */
+[a_lvl, a_val, a_rarity].forEach(e =>
+    e.addEventListener("input", calcArmor)
+);
 
-/* NAVIGATION */
+[w_lvl, w_min, w_max, w_rarity].forEach(e =>
+    e.addEventListener("input", calcWeapon)
+);
+
+/* NAV */
 function showTab(tab, btn) {
-    armorView.style.display = (tab === "armor") ? "block" : "none";
-    weaponView.style.display = (tab === "weapon") ? "block" : "none";
+    armorView.style.display = tab === "armor" ? "block" : "none";
+    weaponView.style.display = tab === "weapon" ? "block" : "none";
 
     document.querySelectorAll(".nav button")
         .forEach(b => b.classList.remove("active"));
